@@ -1,0 +1,53 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Clients{% endblock %}
+
+{% block body %}
+    <h1>Liste des clients</h1>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_client_new') }}" class="btn btn-primary mb-3">Ajouter un client</a>
+    {% endif %}
+
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un client...">
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Email</th>
+                <th>Téléphone</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for client in clients %}
+            <tr onclick="window.location.href='{{ path('app_client_show', {id: client.id}) }}'" style="cursor: pointer;">
+                <td>{{ client.id }}</td>
+                <td>{{ client.nom }}</td>
+                <td>{{ client.email }}</td>
+                <td>{{ client.telephone }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Aucun client trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const rows = document.querySelectorAll('table tbody tr');
+
+        searchInput.addEventListener('keyup', () => {
+            const searchValue = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchValue) ? '' : 'none';
+            });
+        });
+    </script>
+{% endblock %}

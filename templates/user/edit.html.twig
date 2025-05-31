@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier l'utilisateur #{{ user.id }}{% endblock %}
+
+{% block body %}
+    <h1>Modifier l'utilisateur</h1>
+
+    {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_label(form.nom) }}
+            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.nom) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.email) }}
+            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.email) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.role) }}
+            {{ form_widget(form.role, {'attr': {'class': 'form-select'}}) }}
+            {{ form_errors(form.role) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.password) }}
+            {{ form_widget(form.password, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.password) }}
+            <small class="form-text text-muted">Laisse vide pour ne pas modifier le mot de passe.</small>
+        </div>
+
+        <button class="btn btn-success">Enregistrer</button>
+        <a href="{{ path('app_user_show', {'id': user.id}) }}" class="btn btn-secondary ms-2">Annuler</a>
+    {{ form_end(form) }}
+{% endblock %}

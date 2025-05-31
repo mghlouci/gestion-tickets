@@ -1,0 +1,160 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tickets{% endblock %}
+
+{% block body %}
+    <h1>Liste des tickets</h1>
+    <div class="row text-center mb-4">
+        <div class="col-md-3">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Tickets créés</h5>
+                    <p class="card-text display-6" id="count-total">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-dark">
+                <div class="card-body">
+                    <h5 class="card-title">En cours</h5>
+                    <p class="card-text display-6" id="count-encours">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Résolus</h5>
+                    <p class="card-text display-6" id="count-resolu">0</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-dark text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Fermés</h5>
+                    <p class="card-text display-6" id="count-ferme">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <a href="{{ path('app_ticket_new') }}" class="btn btn-primary mb-3">Créer un ticket</a>
+
+
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un ticket...">
+        </div>
+        <div class="col-md-4">
+            <select id="statusFilter" class="form-select">
+                <option value="">Tous les statuts</option>
+                <option value="nouveau">Nouveau</option>
+                <option value="en_cours">En cours</option>
+                <option value="resolu">Résolu</option>
+                <option value="ferme">Fermé</option>
+            </select>
+        </div>
+        <div class="col-md-4">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="filterMesTickets">
+                <label class="form-check-label" for="filterMesTickets">Mes tickets</label>
+            </div>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Titre</th>
+                <th>Statut</th>
+                <th>Projet</th>
+                <th>Date de création</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for ticket in tickets %}
+            <tr class="ticket-row"
+                data-titre="{{ ticket.titre|lower }}"
+                data-statut="{{ ticket.statut }}"
+                data-rapporteur="{{ ticket.rapporteur.email }}"
+                data-developpeur="{{ ticket.developpeur ? ticket.developpeur.email : '' }}"
+                onclick="window.location.href='{{ path('app_ticket_show', {id: ticket.id}) }}'"
+                style="cursor: pointer;">
+                <td>{{ ticket.id }}</td>
+                <td>{{ ticket.titre }}</td>
+                <td>{{ ticket.statut }}</td>
+                <td>{% if ticket.projet is not null %} {{ ticket.projet.nom }} {% endif %}</td>
+                <td>{{ ticket.dateCreation ? ticket.dateCreation|date('d/m/Y H:i') }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">Aucun ticket trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const searchInput = document.getElementById('searchInput');
+            const statusFilter = document.getElementById('statusFilter');
+            const mesTicketsCheckbox = document.getElementById('filterMesTickets');
+            const rows = document.querySelectorAll('.ticket-row');
+            const currentUserEmail = "{{ app.user.email|e('js') }}";
+
+            function filterTable() {
+                const searchValue = searchInput.value.toLowerCase();
+                const statusValue = statusFilter.value.toLowerCase();
+                const onlyMine = mesTicketsCheckbox.checked;
+
+                rows.forEach(row => {
+                    const titre = row.dataset.titre;
+                    const statut = row.dataset.statut.toLowerCase();
+                    const rapporteur = row.dataset.rapporteur;
+                    const developpeur = row.dataset.developpeur;
+
+                    const matchSearch = titre.includes(searchValue);
+                    const matchStatus = !statusValue || statut === statusValue;
+                    const isMine = !onlyMine || rapporteur === currentUserEmail || developpeur === currentUserEmail;
+
+                    row.style.display = (matchSearch && matchStatus && isMine) ? '' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('keyup', filterTable);
+            statusFilter.addEventListener('change', filterTable);
+            mesTicketsCheckbox.addEventListener('change', filterTable);
+
+            filterTable();
+        });
+
+        function updateCounters() {
+            const rows = document.querySelectorAll('table tbody tr');
+            let total = 0, encours = 0, resolu = 0, ferme = 0;
+
+            rows.forEach(row => {
+                if (row.style.display !== 'none') {
+                    total++;
+                    const statut = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                    if (statut === 'en_cours') encours++;
+                    if (statut === 'resolu') resolu++;
+                    if (statut === 'ferme') ferme++;
+                }
+            });
+
+            document.getElementById('count-total').textContent = total;
+            document.getElementById('count-encours').textContent = encours;
+            document.getElementById('count-resolu').textContent = resolu;
+            document.getElementById('count-ferme').textContent = ferme;
+        }
+
+        // met à jour après chaque interaction
+        document.addEventListener('DOMContentLoaded', updateCounters);
+        searchInput.addEventListener('keyup', updateCounters);
+        statusFilter.addEventListener('change', updateCounters);
+        document.getElementById('myTicketsCheckbox')?.addEventListener('change', updateCounters);
+    </script>
+{% endblock %}

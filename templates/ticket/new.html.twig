@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Créer un nouveau ticket{% endblock %}
+
+{% block body %}
+    <h1>Créer un nouveau ticket</h1>
+
+    {{ form_start(form) }}
+
+        <div class="mb-3">
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.titre) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.description) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.priorite) }}
+            {{ form_widget(form.priorite, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.priorite) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.projet) }}
+            {{ form_widget(form.projet, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.projet) }}
+        </div>
+
+        <button class="btn btn-primary">Créer</button>
+        <a href="{{ path('app_ticket_index') }}" class="btn btn-secondary ms-2">← Retour à la liste</a>
+        
+    {{ form_end(form) }}
+{% endblock %}

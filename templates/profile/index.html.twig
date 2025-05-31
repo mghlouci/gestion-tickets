@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon profil{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <h1 class="mb-4">Mon profil</h1>
+
+    {% for label, messages in app.flashes %}
+        <div class="alert alert-{{ label }}">
+            {% for message in messages %}{{ message }}{% endfor %}
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        <div class="col-md-6">
+            <h3>Informations personnelles</h3>
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.email) }}
+                    {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.email) }}
+                </div>
+                <div class="mb-3">
+                    {{ form_label(form.nom) }}
+                    {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.nom) }}
+                </div>
+
+                <h4 class="mt-4">Changer le mot de passe</h4>
+
+                <div class="mb-3">
+                    {{ form_label(form.passwordSection.oldPassword) }}
+                    {{ form_widget(form.passwordSection.oldPassword, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.passwordSection.oldPassword) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.passwordSection.newPassword) }}
+                    {{ form_widget(form.passwordSection.newPassword, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.passwordSection.newPassword) }}
+                </div>
+
+                <div class="mb-3">
+                    {{ form_label(form.passwordSection.confirmPassword) }}
+                    {{ form_widget(form.passwordSection.confirmPassword, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.passwordSection.confirmPassword) }}
+                </div>
+
+                <button type="submit" class="btn btn-primary">Mettre à jour</button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

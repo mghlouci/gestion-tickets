@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateurs{% endblock %}
+
+{% block body %}
+    <h1>Liste des utilisateurs</h1>
+
+    <a href="{{ path('app_user_new') }}" class="btn btn-primary mb-3">Ajouter un utilisateur</a>
+
+    <div class="row mb-3">
+        <div class="col-md-6">
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un utilisateur...">
+        </div>
+        <div class="col-md-6">
+            <select id="roleFilter" class="form-select">
+                <option value="">Tous les rôles</option>
+                <option value="admin">Admin</option>
+                <option value="rapporteur">Rapporteur</option>
+                <option value="dev">Développeur</option>
+            </select>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Email</th>
+                <th>Nom</th>
+                <th>Rôle</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr onclick="window.location.href='{{ path('app_user_show', {id: user.id}) }}'" style="cursor: pointer;">
+                <td>{{ user.id }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.nom }}</td>
+                <td>
+                    {% if user.roles is iterable %}
+                        {{ user.roles[0]|replace({'ROLE_': ''})|lower|capitalize }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4" class="text-center text-muted">Aucun utilisateur trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const roleFilter = document.getElementById('roleFilter');
+        const rows = document.querySelectorAll('table tbody tr');
+
+        function filterRows() {
+            const searchValue = searchInput.value.toLowerCase();
+            const selectedRole = roleFilter.value.toLowerCase();
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                const hasSearch = rowText.includes(searchValue);
+                const hasRole = selectedRole === "" || rowText.includes(selectedRole);
+                row.style.display = hasSearch && hasRole ? '' : 'none';
+            });
+        }
+
+        searchInput.addEventListener('keyup', filterRows);
+        roleFilter.addEventListener('change', filterRows);
+    </script>
+{% endblock %}

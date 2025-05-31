@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Utilisateur #{{ user.id }}{% endblock %}
+
+{% block body %}
+    <h1>Détails de l'utilisateur</h1>
+
+    <div class="card p-3 mb-3">
+        <h4>{{ user.nom }}</h4>
+        <p><strong>Email :</strong> {{ user.email }}</p>
+        <p><strong>Rôle :</strong>
+            {% if user.roles is iterable %}
+                {{ user.roles[0]|replace({'ROLE_': ''})|lower|capitalize }}
+            {% else %}
+                -
+            {% endif %}
+        </p>
+    </div>
+
+    <a href="{{ path('app_user_index') }}" class="btn btn-secondary">← Retour à la liste</a>
+
+    <a href="{{ path('app_user_edit', {'id': user.id}) }}" class="btn btn-warning ms-2">Modifier</a>
+
+    {{ include('user/_delete_form.html.twig') }}
+{% endblock %}

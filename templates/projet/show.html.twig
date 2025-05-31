@@ -1,0 +1,29 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du projet{% endblock %}
+
+{% block body %}
+    <h1>Détails du projet</h1>
+
+    <div class="card p-4 mb-4">
+        <h4>{{ projet.nom }}</h4>
+        <p><strong>Description :</strong> {{ projet.description }}</p>
+        <p><strong>Client :</strong> 
+            <a href="{{ path('app_client_show', { id: projet.client.id }) }}">
+                {{ projet.client.nom }}
+            </a>
+        </p>
+    </div>
+
+    <a href="{{ path('app_ticket_new') }}" class="btn btn-primary mb-3">Créer un ticket</a>
+
+    <div class="d-flex gap-2">
+        <a href="{{ path('app_projet_index') }}" class="btn btn-secondary">← Retour à la liste</a>
+
+        {% if is_granted('ROLE_ADMIN') %}
+            <a href="{{ path('app_projet_edit', { id: projet.id }) }}" class="btn btn-warning">Modifier</a>
+
+            {{ include('projet/_delete_form.html.twig') }}
+        {% endif %}
+    </div>
+{% endblock %}

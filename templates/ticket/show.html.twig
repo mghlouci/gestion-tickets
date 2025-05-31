@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ticket #{{ ticket.id }}{% endblock %}
+
+{% block body %}
+    <h1>Détails du ticket</h1>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h4 class="card-title">{{ ticket.titre }}</h4>
+            <p class="card-text"><strong>Description :</strong> {{ ticket.description }}</p>
+            <p class="card-text"><strong>Statut :</strong> {{ ticket.statut }}</p>
+            <p class="card-text"><strong>Priorité :</strong> {{ ticket.priorite }}</p>
+            <p class="card-text"><strong>Date de création :</strong> {{ ticket.dateCreation|date('d/m/Y H:i') }}</p>
+            <p class="card-text"><strong>Date d’échéance :</strong> {{ ticket.dateEcheance ? ticket.dateEcheance|date('d/m/Y H:i') : 'Non définie' }}</p>
+            <p class="card-text"><strong>Projet :</strong> <a href="{{ path('app_projet_show', {id: ticket.projet.id}) }}">{{ ticket.projet.nom }}</a></p>
+            <p class="card-text"><strong>Rapporteur :</strong> {{ ticket.rapporteur.email }}</p>
+            <p class="card-text"><strong>Développeur :</strong> {{ ticket.developpeur ? ticket.developpeur.email : 'Non assigné' }}</p>
+        </div>
+    </div>
+
+    {% if is_granted('ROLE_DEV') and ticket.developpeur is null %}
+        <form method="post" action="{{ path('app_ticket_assign', {id: ticket.id}) }}" class="mb-4">
+            <button type="submit" class="btn btn-warning">S'assigner ce ticket</button>
+        </form>
+    {% endif %}
+
+    {% if form is defined and form is not null %}
+        <div class="mb-4">
+            <h3>Mettre à jour le ticket</h3>
+            {{ form_start(form) }}
+                <div class="mb-3">
+                    {{ form_label(form.statut) }}
+                    {{ form_widget(form.statut, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.statut) }}
+                </div>
+                <button class="btn btn-primary">Mettre à jour</button>
+            {{ form_end(form) }}
+        </div>
+    {% endif %}
+
+    <h3 class="mt-5">Commentaires</h3>
+
+    {% if ticket.commentaires is empty %}
+        <p class="text-muted">Aucun commentaire pour le moment.</p>
+    {% else %}
+        <ul class="list-group mb-4">
+            {% for commentaire in ticket.commentaires %}
+                <li class="list-group-item">
+                    <div class="fw-bold">{{ commentaire.auteur.email }} 
+                        <span class="text-muted fs-6">({{ commentaire.dateCreation|date('d/m/Y H:i') }})</span>
+                    </div>
+                    <div>{{ commentaire.contenu }}</div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if (app.user == ticket.rapporteur or app.user == ticket.developpeur) and ticket.statut != 'ferme' %}
+        <h4>Ajouter un commentaire</h4>
+        {{ form_start(comment_form) }}
+            <div class="mb-3">
+                {{ form_label(comment_form.contenu) }}
+                {{ form_widget(comment_form.contenu, {'attr': {'class': 'form-control', 'rows': '3'}}) }}
+                {{ form_errors(comment_form.contenu) }}
+            </div>
+            <button type="submit" class="btn btn-secondary">Ajouter</button>
+        {{ form_end(comment_form) }}
+    {% endif %}
+
+
+    <a href="{{ path('app_ticket_index') }}" class="btn btn-secondary">← Retour à la liste</a>
+
+
+{% endblock %}

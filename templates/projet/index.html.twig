@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Projets{% endblock %}
+
+{% block body %}
+    <h1>Liste des projets</h1>
+
+    {% if is_granted('ROLE_ADMIN') %}
+        <a href="{{ path('app_projet_new') }}" class="btn btn-primary mb-3">Ajouter un projet</a>
+    {% endif %}
+
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un projet...">
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nom</th>
+                <th>Client</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for projet in projets %}
+            <tr onclick="window.location.href='{{ path('app_projet_show', {id: projet.id}) }}'" style="cursor: pointer;">
+                <td>{{ projet.id }}</td>
+                <td>{{ projet.nom }}</td>
+                <td>
+                    {% if projet.client %}
+                        {{ projet.client.nom }}
+                    {% else %}
+                        <span class="text-muted">Aucun</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">Aucun projet trouvé.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const rows = document.querySelectorAll('table tbody tr');
+
+        searchInput.addEventListener('keyup', () => {
+            const searchValue = searchInput.value.toLowerCase();
+
+            rows.forEach(row => {
+                const rowText = row.textContent.toLowerCase();
+                row.style.display = rowText.includes(searchValue) ? '' : 'none';
+            });
+        });
+</script>
+{% endblock %}
